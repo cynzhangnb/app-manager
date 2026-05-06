@@ -7,17 +7,22 @@ import PlaceholderPage from './components/pages/PlaceholderPage'
 import { NAV_ITEMS } from './data/navItems'
 
 const START_TAB = { id: 'start', label: 'Start Page' }
-const APP_TABS = {
-  'tenant-manager': { id: 'user-authorization', label: 'User Authorization' },
-}
+const TENANT_DEFAULT_TABS = [
+  { id: 'domain-list',       label: 'Domain List',       noClose: true },
+  { id: 'user-authorization', label: 'User Authorization' },
+]
 
 function getAppMode() {
   const appId = new URLSearchParams(window.location.search).get('app')
   return appId === 'tenant-manager' ? 'tenant-manager' : 'domain-manager'
 }
 
-function getInitialTab(appMode) {
-  return appMode === 'tenant-manager' ? APP_TABS['tenant-manager'] : START_TAB
+function getInitialTabs(appMode) {
+  return appMode === 'tenant-manager' ? TENANT_DEFAULT_TABS : [START_TAB]
+}
+
+function getInitialActiveId(appMode) {
+  return appMode === 'tenant-manager' ? 'domain-list' : 'start'
 }
 
 function renderPage(tabId) {
@@ -56,9 +61,8 @@ function labelForTab(id) {
 
 export default function App() {
   const appMode = getAppMode()
-  const initialTab = getInitialTab(appMode)
-  const [openTabs,   setOpenTabs]   = useState([initialTab])
-  const [activeTabId, setActiveTabId] = useState(initialTab.id)
+  const [openTabs,   setOpenTabs]   = useState(() => getInitialTabs(appMode))
+  const [activeTabId, setActiveTabId] = useState(() => getInitialActiveId(appMode))
 
   useEffect(() => {
     document.title = appMode === 'tenant-manager'

@@ -137,7 +137,7 @@ function UsersTable() {
   return (
     <div style={{ background: '#fff', border: '1px solid #e4e4e4', borderRadius: 8, overflow: 'hidden' }}>
       {/* Table header controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid #e8e8e8' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px 10px 12px', borderBottom: '1px solid #e8e8e8' }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>Current Users</span>
         <span style={{ fontSize: 12, color: '#888' }}>Session Count: <strong style={{ color: '#1a1a1a' }}>42</strong></span>
         <span style={{ fontSize: 12, color: '#555' }}>Client Type:</span>
@@ -197,11 +197,11 @@ function UsersTable() {
 /* ── Start Page ─────────────────────────────────────────────────────────── */
 export default function StartPage() {
   return (
-    <div style={{ padding: '24px 28px' }}>
+    <div style={{ padding: '24px 28px 24px 30px' }}>
       {/* Domain info bar */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 24,
-        padding: '12px 20px',
+        padding: '12px 20px 12px 12px',
         background: '#fff',
         border: '1px solid #e4e4e4',
         borderRadius: 8,

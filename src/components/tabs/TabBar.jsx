@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 function CloseIcon() {
   return (
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth="2.5" strokeLinecap="round">
       <line x1="18" y1="6" x2="6" y2="18"/>
       <line x1="6" y1="6" x2="18" y2="18"/>
@@ -16,18 +16,20 @@ export default function TabBar({ tabs, activeTabId, onSwitchTab, onCloseTab }) {
 
   return (
     <div style={{
-      height: 40,
       display: 'flex',
-      alignItems: 'stretch',
+      alignItems: 'flex-end',
       background: '#fff',
-      borderBottom: '1px solid #e4e4e4',
+      paddingLeft: 30,
+      paddingTop: 6,
       flexShrink: 0,
       overflowX: 'auto',
       overflowY: 'hidden',
+      gap: 2,
+      position: 'relative',
     }}>
-      {tabs.map((tab, i) => {
+      {tabs.map((tab) => {
         const isActive  = tab.id === activeTabId
-        const isStart   = tab.id === 'start'
+        const noClose   = tab.noClose || tab.id === 'start'
         const isHovered = hoveredTabId === tab.id
 
         return (
@@ -40,24 +42,33 @@ export default function TabBar({ tabs, activeTabId, onSwitchTab, onCloseTab }) {
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              padding: '0 14px',
+              padding: '0 12px',
+              height: 32,
               cursor: 'pointer',
               whiteSpace: 'nowrap',
               flexShrink: 0,
-              background: isActive ? '#fff' : isHovered ? '#f5f5f5' : 'transparent',
-              borderBottom: isActive ? '2px solid #378ADD' : '2px solid transparent',
-              borderRight: '1px solid #e8e8e8',
-              color: isActive ? '#1a1a1a' : '#555',
+              borderRadius: '6px 6px 0 0',
+              background: isActive
+                ? '#f9f9f9'
+                : isHovered
+                ? '#f2f2f4'
+                : 'transparent',
+              borderTop: isActive ? '1px solid #e8e8e8' : '1px solid transparent',
+              borderLeft: isActive ? '1px solid #e8e8e8' : '1px solid transparent',
+              borderRight: isActive ? '1px solid #e8e8e8' : '1px solid transparent',
+              borderBottom: isActive ? '1px solid #f9f9f9' : '1px solid transparent',
+              position: 'relative',
+              zIndex: isActive ? 1 : 0,
+              color: isActive ? '#1a1a1a' : '#666',
               fontSize: 13,
               fontWeight: isActive ? 500 : 400,
               transition: 'background 0.1s',
-              position: 'relative',
               userSelect: 'none',
             }}
           >
             <span>{tab.label}</span>
 
-            {!isStart && (
+            {!noClose && (
               <button
                 onClick={e => { e.stopPropagation(); onCloseTab(tab.id) }}
                 onMouseEnter={() => setHoveredCloseId(tab.id)}
@@ -66,9 +77,11 @@ export default function TabBar({ tabs, activeTabId, onSwitchTab, onCloseTab }) {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   width: 16, height: 16,
                   border: 'none',
-                  borderRadius: 3,
-                  background: hoveredCloseId === tab.id ? '#e0e0e0' : 'transparent',
-                  color: '#888',
+                  borderRadius: 4,
+                  background: hoveredCloseId === tab.id
+                    ? (isActive ? '#e4e4e4' : '#e0e0e2')
+                    : 'transparent',
+                  color: '#999',
                   cursor: 'pointer',
                   padding: 0,
                   transition: 'background 0.1s',
@@ -81,6 +94,18 @@ export default function TabBar({ tabs, activeTabId, onSwitchTab, onCloseTab }) {
           </div>
         )
       })}
+
+      {/* Shelf line — sits behind active tab (zIndex 0) but above inactive tabs */}
+      <div style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 1,
+        background: '#e8e8e8',
+        zIndex: 0,
+        pointerEvents: 'none',
+      }} />
     </div>
   )
 }
