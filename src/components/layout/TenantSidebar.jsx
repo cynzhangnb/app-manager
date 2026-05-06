@@ -375,7 +375,7 @@ export default function TenantSidebar({ activeItemId, onSelectItem }) {
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
       <div style={{ borderTop: '1px solid #2e2e2e', padding: '6px 0', flexShrink: 0 }}>
-        <AccountMenu expanded={expanded} />
+        <AccountMenu expanded={expanded} appMode="tenant-manager" />
       </div>
 
       {expanded && tenantSwitcherOpen && (
