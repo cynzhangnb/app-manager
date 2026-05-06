@@ -49,7 +49,7 @@ export default function DomainSwitcher({
 
   const position = useMemo(() => ({
     left: anchorRect ? anchorRect.left : 8,
-    top: anchorRect ? anchorRect.bottom + 6 : 86,
+    top: anchorRect ? anchorRect.bottom + 2 : 86,
   }), [anchorRect])
 
   useEffect(() => {
@@ -87,18 +87,21 @@ export default function DomainSwitcher({
         position: 'fixed',
         left: position.left,
         top: position.top,
-        width: 236,
+        width: 252,
         maxWidth: 'calc(100vw - 18px)',
         background: '#fff',
         border: '1px solid #e4e4e4',
-        borderRadius: 8,
-        boxShadow: '0 6px 18px rgba(0,0,0,0.14), 0 1px 4px rgba(0,0,0,0.08)',
+        borderRadius: 6,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.07)',
         zIndex: 500,
         overflow: 'hidden',
         color: '#1f1f1f',
       }}
     >
-      <div style={{ maxHeight: 320, overflowY: 'auto' }}>
+      <div style={{ maxHeight: 360, overflowY: 'auto', paddingTop: 6 }}>
+        <div style={{ padding: '6px 12px 4px', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.06em', color: '#aaa', textTransform: 'uppercase' }}>
+          Switch Domain
+        </div>
         {tenants.map((tenant, tenantIndex) => {
           const isOpen = openTenantIds.has(tenant.id)
           return (
@@ -115,7 +118,7 @@ export default function DomainSwitcher({
                   paddingRight: 12,
                   border: 'none',
                   background: 'transparent',
-                  color: '#8a8a8a',
+                  color: '#909090',
                   fontSize: 10.5,
                   fontWeight: 700,
                   letterSpacing: '0.04em',
@@ -132,7 +135,7 @@ export default function DomainSwitcher({
               </button>
 
               {isOpen && (
-                <div style={{ padding: '0 0 7px' }}>
+                <div style={{ padding: '0 0 10px' }}>
                   {tenant.domains.map(domain => {
                     const active = tenant.id === activeTenantId && domain.id === activeDomainId
                     const hovered = hoveredId === domain.id
@@ -144,34 +147,25 @@ export default function DomainSwitcher({
                         onMouseLeave={() => setHoveredId(null)}
                         style={{
                           width: '100%',
-                          height: 28,
+                          height: 26,
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'space-between',
                           border: 'none',
                           borderRadius: 0,
-                          background: active || hovered ? '#f0ede7' : 'transparent',
+                          background: hovered ? '#efefef' : 'transparent',
                           cursor: 'pointer',
-                          paddingLeft: 18,
-                          paddingRight: 12,
+                          paddingLeft: 6,
+                          paddingRight: 10,
                           color: '#1a1a1a',
                           fontSize: 12.5,
                           fontWeight: active ? 500 : 400,
                           textAlign: 'left',
                         }}
                       >
-                        <span>{domain.name}</span>
-                        <span style={RIGHT_SLOT_STYLE}>
-                          {active && (
-                            <span style={{
-                              width: 5,
-                              height: 5,
-                              borderRadius: '50%',
-                              background: '#378ADD',
-                              flexShrink: 0,
-                            }} />
-                          )}
+                        <span style={{ width: 20, minWidth: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          {active && <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#378ADD', flexShrink: 0 }} />}
                         </span>
+                        <span style={{ flex: 1, minWidth: 0, textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{domain.name}</span>
                       </button>
                     )
                   })}
@@ -181,43 +175,6 @@ export default function DomainSwitcher({
           )
         })}
 
-        <div style={{ borderTop: '1px solid #ececec', padding: '4px 0 5px' }}>
-          {[
-            { id: 'account-manager', label: 'Account Manager' },
-            { id: 'tenant-manager', label: 'Tenant Manager' },
-            { id: 'netbrain', label: 'NetBrain' },
-          ].map(app => (
-            <button
-              key={app.id}
-              style={{
-                width: '100%',
-                height: 28,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                paddingLeft: 17,
-                paddingRight: 12,
-                color: '#1f1f1f',
-                fontSize: 12.5,
-                textAlign: 'left',
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = '#f0ede7'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-              onClick={() => {
-                onOpenApp?.(app)
-                onClose()
-              }}
-            >
-              <span>{app.label}</span>
-              <span style={{ ...RIGHT_SLOT_STYLE, color: '#888' }}>
-                <ExternalIcon />
-              </span>
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   )

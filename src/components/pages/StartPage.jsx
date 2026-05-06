@@ -87,10 +87,37 @@ function StatCard({ icon, title, count, subtitle, rows }) {
 
 /* ── Users table ────────────────────────────────────────────────────────── */
 const CURRENT_USERS = [
-  { username: 'Yueqin.Li@netbraintech.com (SSO_Office365)',    sessions: [{ name: 'Session25', type: 'Workstation', machine: 'ip-172-31-44-14', ip: '172.31.44.14', browser: 'Edge',   loginTime: '2026-05-04, 9:50:55 AM' }] },
-  { username: 'Yi.Yang@netbraintech.com (SSO_Office365)',       sessions: [{ name: 'Session33', type: 'Workstation', machine: 'ip-172-31-2-46',  ip: '172.31.2.46',  browser: 'Chrome', loginTime: '2026-05-04, 10:34:56 AM' }] },
-  { username: 'Vishnudutta.Pandey@netbraintech.com (SSO_...)',  sessions: [{ name: 'Session11', type: 'Workstation', machine: 'ip-172-31-44-14', ip: '172.31.44.14', browser: 'Edge',   loginTime: '2026-05-04, 8:30:42 AM' }] },
-  { username: 'Vicol.Huang@netbrain.com (SSO_Office365)',       sessions: [{ name: 'Session1',  type: 'Workstation', machine: 'ip-172-31-82-115',ip: '172.31.82.115',browser: 'Chrome', loginTime: '2026-04-28, 2:17:43 PM' }] },
+  { username: 'Yueqin.Li@netbraintech.com (SSO_Office365)',           sessions: [{ name: 'Session25', type: 'Workstation', machine: 'ip-172-31-44-14',  ip: '172.31.44.14',  browser: 'Edge',    loginTime: '2026-05-04, 9:50:55 AM'  }] },
+  { username: 'Yi.Yang@netbraintech.com (SSO_Office365)',              sessions: [{ name: 'Session33', type: 'Workstation', machine: 'ip-172-31-2-46',   ip: '172.31.2.46',   browser: 'Chrome',  loginTime: '2026-05-04, 10:34:56 AM' }] },
+  { username: 'Vishnudutta.Pandey@netbraintech.com (SSO_Office365)',   sessions: [{ name: 'Session11', type: 'Workstation', machine: 'ip-172-31-44-14',  ip: '172.31.44.14',  browser: 'Edge',    loginTime: '2026-05-04, 8:30:42 AM'  }] },
+  { username: 'Vicol.Huang@netbrain.com (SSO_Office365)',              sessions: [{ name: 'Session1',  type: 'Workstation', machine: 'ip-172-31-82-115', ip: '172.31.82.115', browser: 'Chrome',  loginTime: '2026-04-28, 2:17:43 PM'  }] },
+  { username: 'Thomas.Sun@netbraintech.com (SSO_Office365)',           sessions: [{ name: 'Session31', type: 'Workstation', machine: 'ip-172-31-44-190', ip: '172.31.44.190', browser: 'Chrome',  loginTime: '2026-05-06, 11:12:29 AM' }] },
+  { username: 'Thomas.Soares@netbraintech.com (SSO_Office365)',        sessions: [
+    { name: 'Session42', type: 'Chatbot',      machine: 'ip-172-31-44-190', ip: '172.31.44.190', browser: 'Edge',    loginTime: '2026-05-06, 12:38:36 PM' },
+    { name: 'Session15', type: 'Workstation',  machine: 'ip-172-31-94-4',   ip: '172.31.94.4',   browser: 'Edge',    loginTime: '2026-05-06, 7:46:43 AM'  },
+  ]},
+  { username: 'Terry.Fera@netbraintech.com (SSO_Office365)',           sessions: [{ name: 'Session2',  type: 'Workstation', machine: 'ip-172-31-5-177',  ip: '172.31.5.177',  browser: 'Chrome',  loginTime: '2026-05-04, 2:48:33 PM'  }] },
+  { username: 'Sudhakar.Shamkuri@netbraintech.com (SSO_Office365)',    sessions: [{ name: 'Session9',  type: 'Workstation', machine: 'ip-172-31-44-190', ip: '172.31.44.190', browser: 'Chrome',  loginTime: '2026-05-06, 6:06:03 AM'  }] },
+  { username: 'Srinivas.Rao@netbraintech.com (SSO_Office365)',         sessions: [{ name: 'Session18', type: 'Smart CLI',   machine: 'ip-172-31-12-55',  ip: '172.31.12.55',  browser: 'Firefox', loginTime: '2026-05-05, 3:22:11 PM'  }] },
+  { username: 'Priya.Mehta@netbraintech.com (SSO_Office365)',          sessions: [
+    { name: 'Session7',  type: 'Workstation',  machine: 'ip-172-31-22-101', ip: '172.31.22.101', browser: 'Chrome',  loginTime: '2026-05-06, 9:15:44 AM'  },
+    { name: 'Session22', type: 'Workstation',  machine: 'ip-172-31-22-101', ip: '172.31.22.101', browser: 'Chrome',  loginTime: '2026-05-06, 10:02:31 AM' },
+  ]},
+  { username: 'Patrick.Chen@netbraintech.com (SSO_Office365)',         sessions: [{ name: 'Session44', type: 'Workstation', machine: 'ip-172-31-33-77',  ip: '172.31.33.77',  browser: 'Edge',    loginTime: '2026-05-06, 8:44:09 AM'  }] },
+  { username: 'Olivia.Nguyen@netbraintech.com (SSO_Office365)',        sessions: [{ name: 'Session6',  type: 'Smart CLI',   machine: 'ip-172-31-7-200',  ip: '172.31.7.200',  browser: 'Chrome',  loginTime: '2026-05-05, 11:58:20 AM' }] },
+  { username: 'Michael.Zhang@netbraintech.com (SSO_Office365)',        sessions: [
+    { name: 'Session13', type: 'Workstation',  machine: 'ip-172-31-44-14',  ip: '172.31.44.14',  browser: 'Edge',    loginTime: '2026-05-06, 7:30:00 AM'  },
+    { name: 'Session38', type: 'Chatbot',      machine: 'ip-172-31-44-14',  ip: '172.31.44.14',  browser: 'Edge',    loginTime: '2026-05-06, 8:01:55 AM'  },
+  ]},
+  { username: 'Laura.Kim@netbraintech.com (SSO_Office365)',            sessions: [{ name: 'Session5',  type: 'Workstation', machine: 'ip-172-31-60-88',  ip: '172.31.60.88',  browser: 'Safari',  loginTime: '2026-05-05, 4:10:37 PM'  }] },
+  { username: 'Kevin.Patel@netbraintech.com (SSO_Office365)',          sessions: [{ name: 'Session29', type: 'Workstation', machine: 'ip-172-31-9-143',  ip: '172.31.9.143',  browser: 'Chrome',  loginTime: '2026-05-06, 10:55:14 AM' }] },
+  { username: 'Julia.Andersen@netbraintech.com (SSO_Office365)',       sessions: [{ name: 'Session37', type: 'Smart CLI',   machine: 'ip-172-31-51-62',  ip: '172.31.51.62',  browser: 'Firefox', loginTime: '2026-05-06, 6:48:52 AM'  }] },
+  { username: 'Ivan.Petrov@netbraintech.com (SSO_Office365)',          sessions: [
+    { name: 'Session8',  type: 'Workstation',  machine: 'ip-172-31-18-30',  ip: '172.31.18.30',  browser: 'Chrome',  loginTime: '2026-05-04, 1:20:05 PM'  },
+  ]},
+  { username: 'Hannah.Brown@netbraintech.com (SSO_Office365)',         sessions: [{ name: 'Session20', type: 'Workstation', machine: 'ip-172-31-44-190', ip: '172.31.44.190', browser: 'Edge',    loginTime: '2026-05-06, 9:37:28 AM'  }] },
+  { username: 'Grace.Liu@netbraintech.com (SSO_Office365)',            sessions: [{ name: 'Session14', type: 'Workstation', machine: 'ip-172-31-75-19',  ip: '172.31.75.19',  browser: 'Chrome',  loginTime: '2026-05-05, 2:05:41 PM'  }] },
+  { username: 'Frank.Okonkwo@netbraintech.com (SSO_Office365)',        sessions: [{ name: 'Session41', type: 'Chatbot',      machine: 'ip-172-31-44-14',  ip: '172.31.44.14',  browser: 'Chrome',  loginTime: '2026-05-06, 11:44:03 AM' }] },
 ]
 
 function UsersTable() {
