@@ -101,7 +101,7 @@ const TENANTS = [
 
 /* ── Main Sidebar ────────────────────────────────────────────────────────── */
 export default function Sidebar({ expanded, onToggleExpand, onContextChange, navItems, activeItemId, onSelectItem }) {
-  const [openCategories, setOpenCategories] = useState(new Set(['network-analysis']))
+  const [openCategories, setOpenCategories] = useState(new Set())
   const [flyout, setFlyout]             = useState(null)
   const [domainSwitcherOpen, setDomainSwitcherOpen] = useState(false)
   const [activeTenantId, setActiveTenantId] = useState('tenant-nblive')
@@ -231,7 +231,6 @@ export default function Sidebar({ expanded, onToggleExpand, onContextChange, nav
               padding: '0 9px',
               borderRadius: 6,
               background: '#2a2a2d',
-              border: '1px solid #36363a',
             }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                 <circle cx="11" cy="11" r="7" />

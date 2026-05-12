@@ -1,11 +1,9 @@
 export const NAV_ITEMS = [
   {
-    id: 'network-analysis',
-    label: 'Network Analysis',
+    id: 'site-manager',
+    label: 'Site Manager',
     iconKey: 'network-analysis',
-    children: [
-      { id: 'site-manager', label: 'Site Manager' },
-    ],
+    children: [],
   },
   {
     id: 'discovery',

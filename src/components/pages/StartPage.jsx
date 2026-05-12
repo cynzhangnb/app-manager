@@ -23,24 +23,74 @@ function ChevronDownIcon({ size = 12 }) {
   )
 }
 
+function ActionArrowIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  )
+}
+
+function DiscoveryActionIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="7" />
+      <line x1="20" y1="20" x2="16.65" y2="16.65" />
+    </svg>
+  )
+}
+
+function AccuracyActionIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="8" />
+      <path d="M9.5 12.5l1.8 1.8 3.8-4.3" />
+    </svg>
+  )
+}
+
+function SiteActionIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18" />
+      <path d="M12 3a13.5 13.5 0 0 1 0 18" />
+      <path d="M12 3a13.5 13.5 0 0 0 0 18" />
+    </svg>
+  )
+}
+
+function BenchmarkActionIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+    </svg>
+  )
+}
+
 /* ── Stat card ──────────────────────────────────────────────────────────── */
-function StatCard({ title, count, subtitle, rows }) {
+function StatCard({ title, count, subtitle, rows, actionLabel, actionIcon }) {
   return (
     <div style={{
       flex: 1, minWidth: 0,
       background: '#fff',
       border: '1px solid #e4e4e4',
       borderRadius: 8,
-      padding: '20px 24px',
+      padding: '16px 24px 20px',
+      display: 'flex',
+      flexDirection: 'column',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{title}</span>
+      <div style={{ minHeight: 84, marginBottom: 14 }}>
+        <div style={{ marginBottom: 18 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{title}</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          <span style={{ fontSize: 32, fontWeight: 400, color: '#1a1a1a', lineHeight: 1.1 }}>{count}</span>
+          <span style={{ fontSize: 12, color: '#888' }}>{subtitle}</span>
+        </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 14 }}>
-        <span style={{ fontSize: 32, fontWeight: 400, color: '#1a1a1a', lineHeight: 1.1 }}>{count}</span>
-        <span style={{ fontSize: 12, color: '#888' }}>{subtitle}</span>
-      </div>
-      <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: 10 }}>
+      <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: 10, flex: 1 }}>
         {rows.map(([label, value, highlight]) => (
           <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 0' }}>
             <span style={{ fontSize: 12, color: '#555' }}>{label}</span>
@@ -50,6 +100,48 @@ function StatCard({ title, count, subtitle, rows }) {
           </div>
         ))}
       </div>
+      <button
+        style={{
+          marginTop: 16,
+          marginLeft: -24,
+          marginRight: -24,
+          marginBottom: -20,
+          minHeight: 42,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 10,
+          padding: '0 20px',
+          border: 'none',
+          borderTop: '1px solid #ededed',
+          borderRadius: '0 0 8px 8px',
+          background: '#f1f3f5',
+          color: '#3f454d',
+          fontSize: 12.5,
+          fontWeight: 500,
+          cursor: 'pointer',
+          textAlign: 'left',
+          transition: 'background 120ms ease, color 120ms ease',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.background = '#363636'
+          e.currentTarget.style.color = '#ffffff'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.background = '#f1f3f5'
+          e.currentTarget.style.color = '#3f454d'
+        }}
+      >
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <span style={{ display: 'inline-flex', color: 'inherit', flexShrink: 0 }}>
+            {actionIcon}
+          </span>
+          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{actionLabel}</span>
+        </span>
+        <span style={{ display: 'inline-flex', color: 'inherit', flexShrink: 0 }}>
+          <ActionArrowIcon />
+        </span>
+      </button>
     </div>
   )
 }
@@ -106,7 +198,7 @@ function UsersTable() {
   return (
     <div style={{ background: '#fff', border: '1px solid #e4e4e4', borderRadius: 8, overflow: 'hidden' }}>
       {/* Table header controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px 10px 12px', borderBottom: '1px solid #e8e8e8' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px 10px 24px', borderBottom: '1px solid #e8e8e8' }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>Current Users</span>
         <span style={{ fontSize: 12, color: '#888' }}>Session Count: <strong style={{ color: '#1a1a1a' }}>42</strong></span>
         <span style={{ fontSize: 12, color: '#555' }}>Client Type:</span>
@@ -118,9 +210,21 @@ function UsersTable() {
       </div>
 
       {/* Column headers */}
-      <div style={{ display: 'flex', background: '#f8f8f8', borderBottom: '1px solid #e8e8e8', padding: '0 16px' }}>
+      <div style={{ display: 'flex', background: '#f8f8f8', borderBottom: '1px solid #e8e8e8', padding: '0 16px 0 24px' }}>
         {HEADERS.map((h, i) => (
-          <div key={h} style={{ width: COL_WIDTHS[i], fontSize: 12, fontWeight: 600, color: '#555', padding: '7px 6px', flexShrink: 0 }}>{h}</div>
+          <div
+            key={h}
+            style={{
+              width: COL_WIDTHS[i],
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#555',
+              padding: i === 0 ? '7px 6px 7px 0' : '7px 6px',
+              flexShrink: 0,
+            }}
+          >
+            {h}
+          </div>
         ))}
       </div>
 
@@ -130,7 +234,7 @@ function UsersTable() {
           {/* User group header */}
           <div
             onClick={() => toggle(user.username)}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 16px', background: '#fafafa', borderBottom: '1px solid #f0f0f0', cursor: 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 16px 6px 16px', background: '#fafafa', borderBottom: '1px solid #f0f0f0', cursor: 'pointer' }}
           >
             <span style={{ color: '#888', transform: expandedUsers.has(user.username) ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.15s', display: 'inline-flex' }}>
               <ChevronDownIcon size={11} />
@@ -143,8 +247,8 @@ function UsersTable() {
 
           {/* Sessions */}
           {expandedUsers.has(user.username) && user.sessions.map(s => (
-            <div key={s.name} style={{ display: 'flex', padding: '6px 16px', borderBottom: '1px solid #f5f5f5', background: '#fff' }}>
-              <div style={{ width: COL_WIDTHS[0], fontSize: 12, color: '#555', padding: '0 6px', paddingLeft: 28 }}>{s.name}</div>
+            <div key={s.name} style={{ display: 'flex', padding: '6px 16px 6px 16px', borderBottom: '1px solid #f5f5f5', background: '#fff' }}>
+              <div style={{ width: COL_WIDTHS[0], fontSize: 12, color: '#555', padding: '0 6px', paddingLeft: 20 }}>{s.name}</div>
               <div style={{ width: COL_WIDTHS[1], fontSize: 12, color: '#444', padding: '0 6px' }}>{s.type}</div>
               <div style={{ width: COL_WIDTHS[2], fontSize: 12, color: '#444', padding: '0 6px' }}>{s.machine}</div>
               <div style={{ width: COL_WIDTHS[3], fontSize: 12, color: '#444', padding: '0 6px' }}>{s.ip}</div>
@@ -166,25 +270,33 @@ function UsersTable() {
 /* ── Start Page ─────────────────────────────────────────────────────────── */
 export default function StartPage() {
   return (
-    <div style={{ padding: '24px 28px 24px 30px' }}>
+    <div style={{ padding: '24px 20px 24px 20px' }}>
       {/* Domain info bar */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 24,
-        padding: '12px 20px 12px 12px',
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '8px 20px 8px 24px',
         background: '#fff',
         border: '1px solid #e4e4e4',
         borderRadius: 8,
         marginBottom: 20,
       }}>
-        <span style={{ fontSize: 13, color: '#555' }}>Hybrid Network</span>
         <span style={{ fontSize: 13, color: '#555' }}>
-          <strong style={{ color: '#374151' }}>Description:</strong>
+          <strong style={{ color: '#262626' }}>Domain:</strong>
         </span>
+        <span style={{ fontSize: 13, color: '#555' }}>Hybrid Network</span>
         <div style={{ flex: 1 }} />
-        <button style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, color: '#555', border: 'none', background: 'transparent', cursor: 'pointer' }}>
+        <button
+          style={{ display: 'flex', alignItems: 'center', gap: 4, height: 28, fontSize: 13, color: '#555', border: 'none', background: 'transparent', cursor: 'pointer', padding: '0 10px', borderRadius: 4 }}
+          onMouseEnter={e => e.currentTarget.style.background = '#efefef'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+        >
           <EditIcon /> Edit
         </button>
-        <button style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, color: '#555', border: 'none', background: 'transparent', cursor: 'pointer' }}>
+        <button
+          style={{ display: 'flex', alignItems: 'center', gap: 4, height: 28, fontSize: 13, color: '#555', border: 'none', background: 'transparent', cursor: 'pointer', padding: '0 10px', borderRadius: 4 }}
+          onMouseEnter={e => e.currentTarget.style.background = '#efefef'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+        >
           <RefreshIcon /> Refresh
         </button>
       </div>
@@ -192,9 +304,11 @@ export default function StartPage() {
       {/* Stats cards */}
       <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
         <StatCard
-          title="Discover"
+          title="Discovery"
           count={0}
           subtitle="Last Discovered Devices"
+          actionLabel="Discover"
+          actionIcon={<DiscoveryActionIcon />}
           rows={[
             ['Result', 'Not Executed Yet'],
             ['Duration', '--'],
@@ -202,9 +316,11 @@ export default function StartPage() {
           ]}
         />
         <StatCard
-          title="Data Accuracy Resolution"
+          title="Data Accuracy"
           count={455}
           subtitle="Total Discovered Devices"
+          actionLabel="Improve Accuracy"
+          actionIcon={<AccuracyActionIcon />}
           rows={[
             ['Fully Accessed via CLI', '261 (61%)'],
             ['SNMP Configuration Devices', '38'],
@@ -218,6 +334,8 @@ export default function StartPage() {
           title="Site"
           count={81}
           subtitle="Sites"
+          actionLabel="Manage Site"
+          actionIcon={<SiteActionIcon />}
           rows={[
             ['Container Sites', '9'],
             ['Leaf Sites', '72'],
@@ -226,9 +344,11 @@ export default function StartPage() {
           ]}
         />
         <StatCard
-          title="Schedule Task"
+          title="Benchmark"
           count={71}
-          subtitle="Tasks"
+          subtitle="Scheduled Task"
+          actionLabel="Schedule Task"
+          actionIcon={<BenchmarkActionIcon />}
           rows={[
             ['Discovery Task', '8'],
             ['Benchmark Task', '41'],

@@ -2,18 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import NavFlyout from './NavFlyout'
 import TenantSwitcher from './TenantSwitcher'
 import AccountMenu from './AccountMenu'
+import { MANAGED_TENANTS } from '../../data/tenants'
 
 const TENANT_NAV = [
-  {
-    id: 'tenant-management',
-    label: 'Tenant Management',
-    iconKey: 'tenant-management',
-    items: [
-      { id: 'user-authorization', label: 'User Authorization' },
-      { id: 'domain-list', label: 'Domain List' },
-      { id: 'advanced-settings', label: 'Advanced Settings' },
-    ],
-  },
   {
     id: 'platform-management',
     label: 'Platform Management',
@@ -32,11 +23,7 @@ const TENANT_NAV = [
   },
 ]
 
-const TENANTS = [
-  { id: 'tenant-nblive', name: 'NBLive' },
-  { id: 'tenant-acme', name: 'Acme Ops' },
-  { id: 'tenant-bluewave', name: 'BlueWave Labs' },
-]
+const TENANTS = MANAGED_TENANTS
 
 function CollapseIcon() {
   return (
@@ -92,12 +79,17 @@ function DotIcon() {
   )
 }
 
+function getInitialTenantId() {
+  const tenantId = new URLSearchParams(window.location.search).get('tenant')
+  return TENANTS.some(tenant => tenant.id === tenantId) ? tenantId : TENANTS[0].id
+}
+
 export default function TenantSidebar({ expanded, onToggleExpand, onContextChange, activeItemId, onSelectItem }) {
   const [openSections, setOpenSections] = useState(new Set(TENANT_NAV.map(s => s.id)))
   const [flyout, setFlyout]             = useState(null)
   const [hoveredId, setHoveredId]       = useState(null)
   const [tenantSwitcherOpen, setTenantSwitcherOpen] = useState(false)
-  const [activeTenantId, setActiveTenantId] = useState(TENANTS[0].id)
+  const [activeTenantId, setActiveTenantId] = useState(() => getInitialTenantId())
   const [tenantAnchorRect, setTenantAnchorRect] = useState(null)
   const [searchQuery, setSearchQuery]   = useState('')
 
@@ -211,7 +203,6 @@ export default function TenantSidebar({ expanded, onToggleExpand, onContextChang
               padding: '0 9px',
               borderRadius: 6,
               background: '#2a2a2d',
-              border: '1px solid #36363a',
             }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                 <circle cx="11" cy="11" r="7" />

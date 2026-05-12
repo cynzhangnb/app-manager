@@ -7,7 +7,7 @@ import PlaceholderPage from './components/pages/PlaceholderPage'
 import { NAV_ITEMS } from './data/navItems'
 
 const DOMAIN_HOME_ID = 'start'
-const TENANT_HOME_ID = 'domain-list'
+const TENANT_HOME_ID = 'tenant-home'
 
 function getAppMode() {
   const appId = new URLSearchParams(window.location.search).get('app')
@@ -21,14 +21,17 @@ function getInitialPageId(appMode) {
 function renderPage(pageId) {
   if (pageId === DOMAIN_HOME_ID) return <StartPage />
   if (pageId === 'schedule-task') return <ScheduleTaskPage />
+  if (pageId === TENANT_HOME_ID) return <TenantManagerPage view="tenant-home" />
   if (pageId === 'user-authorization') return <TenantManagerPage view="user-authorization" />
-  if (pageId === TENANT_HOME_ID) return <TenantManagerPage view="domain-list" />
+  if (pageId === 'domain-list') return <TenantManagerPage view="domain-list" />
+  if (pageId === 'advanced-settings') return <TenantManagerPage view="advanced-settings" />
   return <PlaceholderPage label={labelForPage(pageId)} />
 }
 
 function labelForPage(id) {
   const fixedLabels = {
     start: 'Start Page',
+    'tenant-home': 'Tenant Management',
     'user-authorization': 'User Authorization',
     'domain-list': 'Domain List',
     'advanced-settings': 'Advanced Settings',

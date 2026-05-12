@@ -123,7 +123,7 @@ export default function AppShell({ appMode = 'domain-manager', navItems, activeI
 
         {/* App name header */}
         <div style={{
-          height: 40,
+          height: 46,
           display: 'flex',
           alignItems: 'center',
           gap: 8,
