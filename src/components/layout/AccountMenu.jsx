@@ -72,6 +72,8 @@ const MENU_ITEMS = [
 export default function AccountMenu({ expanded = true, user = 'cynthia.zhang@netbrain.com', appMode = 'domain-manager' }) {
   const [open, setOpen] = useState(false)
   const [tenantDialogOpen, setTenantDialogOpen] = useState(false)
+  const [domainDialogOpen, setDomainDialogOpen] = useState(false)
+  const [openTenantIds, setOpenTenantIds] = useState(() => new Set(MANAGED_TENANTS.map(t => t.id)))
   const menuRef = useRef(null)
 
   useEffect(() => {
@@ -96,6 +98,26 @@ export default function AccountMenu({ expanded = true, user = 'cynthia.zhang@net
     a.target = '_blank'
     a.rel = 'noopener noreferrer'
     a.click()
+  }
+
+  function openDomainManagementForDomain(tenantId, domainId) {
+    const url = new URL(window.location.href)
+    url.searchParams.delete('app')
+    url.searchParams.set('tenant', tenantId)
+    url.searchParams.set('domain', domainId)
+    const a = document.createElement('a')
+    a.href = url.toString()
+    a.target = '_blank'
+    a.rel = 'noopener noreferrer'
+    a.click()
+  }
+
+  function toggleTenant(tenantId) {
+    setOpenTenantIds(prev => {
+      const next = new Set(prev)
+      next.has(tenantId) ? next.delete(tenantId) : next.add(tenantId)
+      return next
+    })
   }
 
   return (
@@ -196,8 +218,8 @@ export default function AccountMenu({ expanded = true, user = 'cynthia.zhang@net
                 {[
                   { label: 'System Management', onClick: null },
                   appMode === 'tenant-manager'
-                    ? { label: 'Domain Management', onClick: () => { const u = new URL(window.location.href); u.searchParams.delete('app'); const a = document.createElement('a'); a.href = u.toString(); a.target = '_blank'; a.rel = 'noopener noreferrer'; a.click() } }
-                  : { label: 'Tenant Management', onClick: () => { setOpen(false); setTenantDialogOpen(true) } },
+                    ? { label: 'Domain Management', onClick: () => { setOpen(false); setDomainDialogOpen(true) } }
+                    : { label: 'Tenant Management', onClick: () => { setOpen(false); setTenantDialogOpen(true) } },
                   { label: 'NetBrain', onClick: null },
                 ].map(({ label, onClick }) => (
                 <button
@@ -251,6 +273,137 @@ export default function AccountMenu({ expanded = true, user = 'cynthia.zhang@net
               </span>
               <span>Log out</span>
             </button>
+          </div>
+        </div>
+      )}
+
+      {domainDialogOpen && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(17, 24, 39, 0.38)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+        }}
+          onMouseDown={e => { if (e.target === e.currentTarget) setDomainDialogOpen(false) }}
+        >
+          <div style={{
+            width: 380,
+            maxWidth: 'calc(100vw - 32px)',
+            background: '#fff',
+            borderRadius: 8,
+            boxShadow: '0 16px 40px rgba(0,0,0,0.16)',
+            overflow: 'hidden',
+          }}>
+            <div style={{ padding: '16px 18px 10px', borderBottom: '1px solid #ededed' }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#262626', marginBottom: 4 }}>
+                Open Domain Management
+              </div>
+              <div style={{ fontSize: 12.5, lineHeight: 1.45, color: '#666' }}>
+                Select the domain you want to manage. Domains are grouped by tenant.
+              </div>
+            </div>
+
+            <div style={{ maxHeight: 320, overflowY: 'auto', padding: '6px 0' }}>
+              {MANAGED_TENANTS.map((tenant, tenantIndex) => {
+                const isOpen = openTenantIds.has(tenant.id)
+                return (
+                  <div key={tenant.id} style={{ borderTop: tenantIndex === 0 ? 'none' : '1px solid #ececec' }}>
+                    {/* Tenant header row */}
+                    <button
+                      onClick={() => toggleTenant(tenant.id)}
+                      style={{
+                        width: '100%',
+                        height: 32,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0 18px',
+                        border: 'none',
+                        background: 'transparent',
+                        color: '#999',
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#f8f8f8'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <span>{tenant.name}</span>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                        style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.14s ease', flexShrink: 0 }}>
+                        <polyline points="6 9 12 15 18 9"/>
+                      </svg>
+                    </button>
+
+                    {/* Domain rows */}
+                    {isOpen && (
+                      <div style={{ paddingBottom: 6 }}>
+                        {tenant.domains.map(domain => (
+                          <button
+                            key={domain.id}
+                            onClick={() => {
+                              setDomainDialogOpen(false)
+                              openDomainManagementForDomain(tenant.id, domain.id)
+                            }}
+                            style={{
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '8px 18px 8px 30px',
+                              border: 'none',
+                              background: 'transparent',
+                              color: '#1a1a1a',
+                              fontSize: 13,
+                              fontWeight: 400,
+                              textAlign: 'left',
+                              cursor: 'pointer',
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = '#f5f6f8'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                          >
+                            <span>{domain.name}</span>
+                            <span style={{ display: 'inline-flex', color: '#bbb', flexShrink: 0 }}>
+                              <ExternalIcon />
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+
+            <div style={{
+              padding: '10px 18px 14px',
+              borderTop: '1px solid #ededed',
+              display: 'flex',
+              justifyContent: 'flex-end',
+            }}>
+              <button
+                onClick={() => setDomainDialogOpen(false)}
+                style={{
+                  height: 32,
+                  padding: '0 14px',
+                  border: '1px solid #d8d8d8',
+                  borderRadius: 6,
+                  background: '#fff',
+                  color: '#444',
+                  fontSize: 13,
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
