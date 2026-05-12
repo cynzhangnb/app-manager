@@ -181,7 +181,7 @@ export default function AccountMenu({ expanded = true, user = 'cynthia.zhang@net
             </div>
             <div style={{ padding: '2px 0 6px' }}>
               {[
-                { label: 'Account Management', onClick: null },
+                { label: 'System Management', onClick: null },
                 appMode === 'tenant-manager'
                   ? { label: 'Domain Management', onClick: () => { const u = new URL(window.location.href); u.searchParams.delete('app'); const a = document.createElement('a'); a.href = u.toString(); a.target = '_blank'; a.rel = 'noopener noreferrer'; a.click() } }
                   : { label: 'Tenant Management', onClick: () => { const u = new URL(window.location.href); u.searchParams.set('app', 'tenant-manager'); const a = document.createElement('a'); a.href = u.toString(); a.target = '_blank'; a.rel = 'noopener noreferrer'; a.click() } },

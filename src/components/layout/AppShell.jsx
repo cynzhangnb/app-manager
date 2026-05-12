@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import Sidebar from './Sidebar'
 import TenantSidebar from './TenantSidebar'
-import TabBar from '../tabs/TabBar'
 
 function LogoMark() {
   return (
@@ -11,11 +10,98 @@ function LogoMark() {
   )
 }
 
-export default function AppShell({ appMode = 'domain-manager', navItems, activeItemId, openTabs, activeTabId, onSelectItem, onSwitchTab, onCloseTab, children }) {
-  const [expanded, setExpanded] = useState(true)
-  const [contextLabel, setContextLabel] = useState(
-    appMode === 'tenant-manager' ? 'NBLive' : 'Hybrid Network'
+function HeaderTrail({ showBreadcrumb, breadcrumbItems, appName }) {
+  const homeItem = showBreadcrumb ? breadcrumbItems[0] : null
+  const currentItem = showBreadcrumb ? breadcrumbItems[1] : null
+  const defaultTextColor = '#262626'
+  const homeBreadcrumbColor = '#565656'
+  const hoverTextColor = defaultTextColor
+  const contentStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    minWidth: 0,
+    gap: 6,
+    minHeight: 20,
+  }
+
+  return (
+    <nav aria-label="breadcrumb" style={contentStyle}>
+      <button
+        onClick={homeItem?.onClick}
+        disabled={!showBreadcrumb}
+        style={{
+          border: 'none',
+          background: 'transparent',
+          padding: 0,
+          margin: 0,
+          fontSize: showBreadcrumb ? 13.5 : 14,
+          lineHeight: 1,
+          color: showBreadcrumb ? homeBreadcrumbColor : defaultTextColor,
+          cursor: showBreadcrumb ? 'pointer' : 'default',
+          whiteSpace: 'nowrap',
+          fontWeight: showBreadcrumb ? 400 : 600,
+          letterSpacing: '-0.01em',
+          transition: 'font-size 180ms ease, font-weight 180ms ease, color 120ms ease, opacity 180ms ease',
+          textDecoration: 'none',
+          display: 'inline-flex',
+          alignItems: 'center',
+          height: 20,
+        }}
+        onMouseEnter={e => {
+          if (showBreadcrumb) {
+            e.currentTarget.style.color = hoverTextColor
+          }
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.color = showBreadcrumb ? homeBreadcrumbColor : defaultTextColor
+        }}
+      >
+        {showBreadcrumb ? homeItem?.label : appName}
+      </button>
+
+      <span style={{
+        color: '#525252',
+        fontSize: 13.5,
+        lineHeight: 1,
+        userSelect: 'none',
+        opacity: showBreadcrumb ? 1 : 0,
+        maxWidth: showBreadcrumb ? 12 : 0,
+        overflow: 'hidden',
+        transition: 'opacity 180ms ease, max-width 180ms ease',
+        flexShrink: 0,
+        display: 'inline-flex',
+        alignItems: 'center',
+        alignSelf: 'center',
+        height: 20,
+      }}>
+        /
+      </span>
+
+      <span style={{
+        fontSize: 13.5,
+        lineHeight: 1,
+        color: defaultTextColor,
+        fontWeight: 600,
+        letterSpacing: '-0.01em',
+        whiteSpace: 'nowrap',
+        opacity: showBreadcrumb ? 1 : 0,
+        maxWidth: showBreadcrumb ? 220 : 0,
+        overflow: 'hidden',
+        transition: 'opacity 180ms ease, max-width 180ms ease',
+        flexShrink: 0,
+        display: 'inline-flex',
+        alignItems: 'center',
+        alignSelf: 'center',
+        height: 20,
+      }}>
+        {currentItem?.label ?? ''}
+      </span>
+    </nav>
   )
+}
+
+export default function AppShell({ appMode = 'domain-manager', navItems, activeItemId, showBreadcrumb = false, breadcrumbItems = [], onSelectItem, children }) {
+  const [expanded, setExpanded] = useState(true)
 
   const SidebarComponent = appMode === 'tenant-manager' ? TenantSidebar : Sidebar
   const appName = appMode === 'tenant-manager' ? 'Tenant Management' : 'Domain Management'
@@ -27,7 +113,6 @@ export default function AppShell({ appMode = 'domain-manager', navItems, activeI
       <SidebarComponent
         expanded={expanded}
         onToggleExpand={() => setExpanded(e => !e)}
-        onContextChange={setContextLabel}
         navItems={navItems}
         activeItemId={activeItemId}
         onSelectItem={onSelectItem}
@@ -47,32 +132,14 @@ export default function AppShell({ appMode = 'domain-manager', navItems, activeI
           flexShrink: 0,
         }}>
           <LogoMark />
-          <span style={{
-            fontSize: 14,
-            fontWeight: 600,
-            color: '#1a1a1a',
-            letterSpacing: '-0.01em',
-            whiteSpace: 'nowrap',
-          }}>
-            {appName}
-          </span>
-          {!expanded && contextLabel && (
-            <>
-              <span style={{ color: '#ccc', fontSize: 14, userSelect: 'none' }}>/</span>
-              <span style={{ fontSize: 13, color: '#555', whiteSpace: 'nowrap' }}>
-                {contextLabel}
-              </span>
-            </>
-          )}
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center' }}>
+            <HeaderTrail
+              showBreadcrumb={showBreadcrumb}
+              breadcrumbItems={breadcrumbItems}
+              appName={appName}
+            />
+          </div>
         </div>
-
-        {/* Tab bar */}
-        <TabBar
-          tabs={openTabs}
-          activeTabId={activeTabId}
-          onSwitchTab={onSwitchTab}
-          onCloseTab={onCloseTab}
-        />
 
         {/* Content */}
         <div style={{ flex: 1, overflow: 'auto', background: '#f9f9f9' }}>

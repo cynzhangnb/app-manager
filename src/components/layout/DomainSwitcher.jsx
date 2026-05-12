@@ -158,7 +158,7 @@ export default function DomainSwitcher({
                           paddingRight: 10,
                           color: '#1a1a1a',
                           fontSize: 12.5,
-                          fontWeight: active ? 500 : 400,
+                          fontWeight: active ? 600 : 400,
                           textAlign: 'left',
                         }}
                       >

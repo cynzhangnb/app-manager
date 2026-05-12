@@ -6,35 +6,29 @@ import TenantManagerPage from './components/pages/TenantManagerPage'
 import PlaceholderPage from './components/pages/PlaceholderPage'
 import { NAV_ITEMS } from './data/navItems'
 
-const START_TAB = { id: 'start', label: 'Start Page' }
-const TENANT_DEFAULT_TABS = [
-  { id: 'domain-list',       label: 'Domain List',       noClose: true },
-  { id: 'user-authorization', label: 'User Authorization' },
-]
+const DOMAIN_HOME_ID = 'start'
+const TENANT_HOME_ID = 'domain-list'
 
 function getAppMode() {
   const appId = new URLSearchParams(window.location.search).get('app')
   return appId === 'tenant-manager' ? 'tenant-manager' : 'domain-manager'
 }
 
-function getInitialTabs(appMode) {
-  return appMode === 'tenant-manager' ? TENANT_DEFAULT_TABS : [START_TAB]
+function getInitialPageId(appMode) {
+  return appMode === 'tenant-manager' ? TENANT_HOME_ID : DOMAIN_HOME_ID
 }
 
-function getInitialActiveId(appMode) {
-  return appMode === 'tenant-manager' ? 'domain-list' : 'start'
+function renderPage(pageId) {
+  if (pageId === DOMAIN_HOME_ID) return <StartPage />
+  if (pageId === 'schedule-task') return <ScheduleTaskPage />
+  if (pageId === 'user-authorization') return <TenantManagerPage view="user-authorization" />
+  if (pageId === TENANT_HOME_ID) return <TenantManagerPage view="domain-list" />
+  return <PlaceholderPage label={labelForPage(pageId)} />
 }
 
-function renderPage(tabId) {
-  if (tabId === 'start')         return <StartPage />
-  if (tabId === 'schedule-task') return <ScheduleTaskPage />
-  if (tabId === 'user-authorization') return <TenantManagerPage view="user-authorization" />
-  if (tabId === 'domain-list') return <TenantManagerPage view="domain-list" />
-  return <PlaceholderPage label={labelForTab(tabId)} />
-}
-
-function labelForTab(id) {
+function labelForPage(id) {
   const fixedLabels = {
+    start: 'Start Page',
     'user-authorization': 'User Authorization',
     'domain-list': 'Domain List',
     'advanced-settings': 'Advanced Settings',
@@ -59,10 +53,26 @@ function labelForTab(id) {
   return id
 }
 
+function getBreadcrumbConfig(appMode, pageId, onNavigateHome) {
+  const homeId = appMode === 'tenant-manager' ? TENANT_HOME_ID : DOMAIN_HOME_ID
+  const homeLabel = appMode === 'tenant-manager' ? 'Tenant Management' : 'Domain Management'
+
+  if (pageId === homeId) {
+    return { showBreadcrumb: false, breadcrumbItems: [] }
+  }
+
+  return {
+    showBreadcrumb: true,
+    breadcrumbItems: [
+      { id: homeId, label: homeLabel, onClick: onNavigateHome },
+      { id: pageId, label: labelForPage(pageId) },
+    ],
+  }
+}
+
 export default function App() {
   const appMode = getAppMode()
-  const [openTabs,   setOpenTabs]   = useState(() => getInitialTabs(appMode))
-  const [activeTabId, setActiveTabId] = useState(() => getInitialActiveId(appMode))
+  const [currentPageId, setCurrentPageId] = useState(() => getInitialPageId(appMode))
 
   useEffect(() => {
     document.title = appMode === 'tenant-manager'
@@ -70,54 +80,36 @@ export default function App() {
       : 'Domain Management — NetBrain'
   }, [appMode])
 
+  useEffect(() => {
+    setCurrentPageId(getInitialPageId(appMode))
+  }, [appMode])
+
   const handleNavSelect = useCallback((item) => {
-    setOpenTabs(prev => {
-      if (prev.some(t => t.id === item.id)) return prev
-      return [...prev, { id: item.id, label: item.label }]
-    })
-    setActiveTabId(item.id)
+    setCurrentPageId(item.id)
   }, [])
 
-  const handleSwitchTab = useCallback((id) => {
-    setActiveTabId(id)
-  }, [])
+  const handleNavigateHome = useCallback(() => {
+    setCurrentPageId(getInitialPageId(appMode))
+  }, [appMode])
 
-  const handleCloseTab = useCallback((id) => {
-    setOpenTabs(prev => {
-      const idx  = prev.findIndex(t => t.id === id)
-      const next = prev.filter(t => t.id !== id)
-      if (activeTabId === id) {
-        const newActive = next[Math.max(0, idx - 1)]
-        setActiveTabId(newActive ? newActive.id : 'start')
-      }
-      return next
-    })
-  }, [activeTabId])
+  const { showBreadcrumb, breadcrumbItems } = getBreadcrumbConfig(
+    appMode,
+    currentPageId,
+    handleNavigateHome
+  )
 
   return (
     <AppShell
       appMode={appMode}
       navItems={NAV_ITEMS}
-      activeItemId={null}
-      openTabs={openTabs}
-      activeTabId={activeTabId}
+      activeItemId={currentPageId === DOMAIN_HOME_ID || currentPageId === TENANT_HOME_ID ? null : currentPageId}
+      showBreadcrumb={showBreadcrumb}
+      breadcrumbItems={breadcrumbItems}
       onSelectItem={handleNavSelect}
-      onSwitchTab={handleSwitchTab}
-      onCloseTab={handleCloseTab}
     >
-      {/* Render all open tab pages; hide inactive ones to preserve state */}
-      {openTabs.map(tab => (
-        <div
-          key={tab.id}
-          style={{
-            display: activeTabId === tab.id ? 'flex' : 'none',
-            flexDirection: 'column',
-            height: '100%',
-          }}
-        >
-          {renderPage(tab.id)}
-        </div>
-      ))}
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        {renderPage(currentPageId)}
+      </div>
     </AppShell>
   )
 }

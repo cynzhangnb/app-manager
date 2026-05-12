@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-export default function NavFlyout({ category, anchorTop, onSelectItem, onClose }) {
+export default function NavFlyout({ category, anchorTop, activeItemId, onSelectItem, onClose }) {
   const ref = useRef(null)
 
   useEffect(() => {
@@ -46,28 +46,47 @@ export default function NavFlyout({ category, anchorTop, onSelectItem, onClose }
 
       {/* Sub-items */}
       {category.children.length > 0 ? (
-        category.children.map(child => (
-          <button
-            key={child.id}
-            onClick={() => { onSelectItem(child); onClose() }}
-            style={{
-              display: 'block',
-              width: '100%',
-              textAlign: 'left',
-              padding: '7px 14px',
-              border: 'none',
-              background: 'transparent',
-              fontSize: 13,
-              color: '#374151',
-              cursor: 'pointer',
-              transition: 'background 0.1s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = '#f0ede7'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-          >
-            {child.label}
-          </button>
-        ))
+        category.children.map(child => {
+          const isActive = child.id === activeItemId
+
+          return (
+            <button
+              key={child.id}
+              onClick={() => { onSelectItem(child); onClose() }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 10,
+                width: '100%',
+                textAlign: 'left',
+                padding: '7px 14px',
+                border: 'none',
+                background: 'transparent',
+                fontSize: 12.5,
+                color: '#374151',
+                cursor: 'pointer',
+                transition: 'background 0.1s',
+                fontWeight: isActive ? 600 : 400,
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = '#f0ede7'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {child.label}
+              </span>
+              {isActive && (
+                <span style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  background: '#378ADD',
+                  flexShrink: 0,
+                }} />
+              )}
+            </button>
+          )
+        })
       ) : (
         /* Childless category — clicking the icon already triggered the tab */
         <div style={{ padding: '6px 14px 2px', fontSize: 13, color: '#888' }}>

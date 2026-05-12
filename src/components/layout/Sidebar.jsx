@@ -108,6 +108,7 @@ export default function Sidebar({ expanded, onToggleExpand, onContextChange, nav
   const [activeDomainId, setActiveDomainId] = useState('hybrid-network')
   const [domainAnchorRect, setDomainAnchorRect] = useState(null)
   const [hoveredId, setHoveredId]       = useState(null)
+  const [searchQuery, setSearchQuery]   = useState('')
 
   const domainButtonRef = useRef(null)
   const sidebarRef      = useRef(null)
@@ -138,13 +139,14 @@ export default function Sidebar({ expanded, onToggleExpand, onContextChange, nav
   }
 
   function handleCategoryIconClick(e, category) {
-    if (expanded) {
-      toggleCategory(category.id)
-      return
-    }
     if (category.children.length === 0) {
       onSelectItem(category)
       setFlyout(null)
+      return
+    }
+
+    if (expanded) {
+      toggleCategory(category.id)
       return
     }
     const rect = e.currentTarget.getBoundingClientRect()
@@ -177,6 +179,23 @@ export default function Sidebar({ expanded, onToggleExpand, onContextChange, nav
 
   const SIDEBAR_W = expanded ? 220 : 44
   const containerOverflow = expanded ? 'visible' : overflow
+  const normalizedQuery = searchQuery.trim().toLowerCase()
+  const isFiltering = normalizedQuery.length > 0
+  const visibleNavItems = navItems
+    .map(category => {
+      const categoryMatches = category.label.toLowerCase().includes(normalizedQuery)
+      const matchingChildren = category.children.filter(child =>
+        child.label.toLowerCase().includes(normalizedQuery)
+      )
+
+      if (!isFiltering) return category
+      if (categoryMatches) return category
+      if (matchingChildren.length > 0) {
+        return { ...category, children: matchingChildren }
+      }
+      return null
+    })
+    .filter(Boolean)
 
   return (
     <div
@@ -200,12 +219,61 @@ export default function Sidebar({ expanded, onToggleExpand, onContextChange, nav
       {expanded ? (
         <div style={{
           flexShrink: 0,
-          height: 40,
-          padding: '0 6px 0 8px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
+          padding: '8px',
         }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            <div style={{
+              flex: 1,
+              height: 30,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '0 9px',
+              borderRadius: 6,
+              background: '#2a2a2d',
+              border: '1px solid #36363a',
+            }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <circle cx="11" cy="11" r="7" />
+                <line x1="20" y1="20" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search navigation"
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  border: 'none',
+                  outline: 'none',
+                  background: 'transparent',
+                  color: '#ededed',
+                  fontSize: 12.5,
+                }}
+              />
+            </div>
+            <button
+              onClick={onToggleExpand}
+              title="Collapse sidebar"
+              style={{
+                width: 28,
+                height: 28,
+                border: 'none',
+                background: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#c0c0c0',
+                cursor: 'pointer',
+                borderRadius: 4,
+                flexShrink: 0,
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = '#2e2e2e'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              <CollapseIcon />
+            </button>
+          </div>
           <button
             ref={domainButtonRef}
             onClick={toggleDomainSwitcher}
@@ -213,13 +281,13 @@ export default function Sidebar({ expanded, onToggleExpand, onContextChange, nav
             onMouseEnter={e => { if (!domainSwitcherOpen) e.currentTarget.style.background = '#525252' }}
             onMouseLeave={e => { if (!domainSwitcherOpen) e.currentTarget.style.background = '#4a4a4a' }}
             style={{
-              flex: 1,
+              width: '100%',
               minWidth: 0,
               height: 28,
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              padding: '0 2px 0 6px',
+              padding: '0 6px',
               border: 'none',
               borderRadius: 6,
               background: domainSwitcherOpen ? '#585858' : '#4a4a4a',
@@ -240,52 +308,45 @@ export default function Sidebar({ expanded, onToggleExpand, onContextChange, nav
               {activeDomain?.name ?? 'Select Domain'}
             </span>
           </button>
-          <button
-            onClick={onToggleExpand}
-            title="Collapse sidebar"
-            style={{
-              width: 28, height: 28, border: 'none', background: 'transparent',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#c0c0c0', cursor: 'pointer', borderRadius: 4, flexShrink: 0,
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = '#2e2e2e'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-          >
-            <CollapseIcon />
-          </button>
         </div>
       ) : (
         <div style={{
-          height: 40,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
           flexShrink: 0,
+          padding: '6px 0',
         }}>
-          <button
-            onClick={onToggleExpand}
-            title="Expand sidebar"
-            style={{
-              width: 32, height: 28, border: 'none', background: 'transparent',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#ffffff', cursor: 'pointer', borderRadius: 4,
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = '#2e2e2e'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-          >
-            <HamburgerIcon />
-          </button>
+          <div style={{
+            height: 40,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <button
+              onClick={onToggleExpand}
+              title="Expand sidebar"
+              style={{
+                width: 32, height: 28, border: 'none', background: 'transparent',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#ffffff', cursor: 'pointer', borderRadius: 4,
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = '#2e2e2e'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              <HamburgerIcon />
+            </button>
+          </div>
         </div>
       )}
 
       {/* ── Nav items ──────────────────────────────────────────────────── */}
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '6px 0' }}>
-        {navItems.map(category => {
+        {visibleNavItems.map(category => {
           const hasChildren = category.children.length > 0
           const isOpen      = openCategories.has(category.id)
-          const isCatActive = activeItemId === category.id ||
-            (hasChildren && category.children.some(c => c.id === activeItemId))
+          const hasActiveChild = hasChildren && category.children.some(child => child.id === activeItemId)
+          const isCatActive = activeItemId === category.id
+          const isCollapsedActive = !expanded && (isCatActive || hasActiveChild)
           const isFlyoutOpen = flyout && flyout.category.id === category.id
+          const showChildren = expanded && hasChildren && (isFiltering || isOpen)
 
           return (
             <div key={category.id}>
@@ -309,7 +370,9 @@ export default function Sidebar({ expanded, onToggleExpand, onContextChange, nav
                   padding: expanded ? '0 10px 0 12px' : '0',
                   height: 34,
                   border: 'none',
-                  background: isCatActive
+                  background: isCollapsedActive
+                    ? '#3a3a3a'
+                    : isCatActive
                     ? '#3a3a3a'
                     : isFlyoutOpen
                     ? '#363636'
@@ -318,7 +381,9 @@ export default function Sidebar({ expanded, onToggleExpand, onContextChange, nav
                     : 'transparent',
                   cursor: 'pointer',
                   justifyContent: expanded ? 'flex-start' : 'center',
-                  borderLeft: isCatActive ? '2px solid #378ADD' : '2px solid transparent',
+                  borderLeft: expanded
+                    ? (isCatActive ? '2px solid #378ADD' : '2px solid transparent')
+                    : (isCollapsedActive ? '2px solid #378ADD' : '2px solid transparent'),
                   transition: 'background 0.1s',
                   position: 'relative',
                 }}
@@ -326,7 +391,7 @@ export default function Sidebar({ expanded, onToggleExpand, onContextChange, nav
                 <span style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   width: 20, height: 20, flexShrink: 0,
-                  color: isCatActive ? '#378ADD' : '#ffffff',
+                  color: '#ffffff',
                 }}>
                   <NavIcon iconKey={category.iconKey} />
                 </span>
@@ -360,7 +425,7 @@ export default function Sidebar({ expanded, onToggleExpand, onContextChange, nav
                 )}
               </button>
 
-              {expanded && hasChildren && isOpen && (
+              {showChildren && (
                 <div>
                   {category.children.map(child => {
                     const isActive = activeItemId === child.id
@@ -416,6 +481,7 @@ export default function Sidebar({ expanded, onToggleExpand, onContextChange, nav
         <NavFlyout
           category={flyout.category}
           anchorTop={flyout.anchorTop}
+          activeItemId={activeItemId}
           onSelectItem={onSelectItem}
           onClose={() => setFlyout(null)}
         />

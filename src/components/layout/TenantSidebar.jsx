@@ -99,6 +99,7 @@ export default function TenantSidebar({ expanded, onToggleExpand, onContextChang
   const [tenantSwitcherOpen, setTenantSwitcherOpen] = useState(false)
   const [activeTenantId, setActiveTenantId] = useState(TENANTS[0].id)
   const [tenantAnchorRect, setTenantAnchorRect] = useState(null)
+  const [searchQuery, setSearchQuery]   = useState('')
 
   const tenantButtonRef = useRef(null)
 
@@ -160,6 +161,23 @@ export default function TenantSidebar({ expanded, onToggleExpand, onContextChang
 
   const SIDEBAR_W = expanded ? 220 : 44
   const containerOverflow = expanded ? 'visible' : overflow
+  const normalizedQuery = searchQuery.trim().toLowerCase()
+  const isFiltering = normalizedQuery.length > 0
+  const visibleSections = TENANT_NAV
+    .map(section => {
+      const sectionMatches = section.label.toLowerCase().includes(normalizedQuery)
+      const matchingItems = section.items.filter(item =>
+        item.label.toLowerCase().includes(normalizedQuery)
+      )
+
+      if (!isFiltering) return section
+      if (sectionMatches) return section
+      if (matchingItems.length > 0) {
+        return { ...section, items: matchingItems }
+      }
+      return null
+    })
+    .filter(Boolean)
 
   return (
     <div style={{
@@ -181,12 +199,53 @@ export default function TenantSidebar({ expanded, onToggleExpand, onContextChang
       {expanded ? (
         <div style={{
           flexShrink: 0,
-          height: 40,
-          padding: '0 6px 0 8px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
+          padding: '8px',
         }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            <div style={{
+              flex: 1,
+              height: 30,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '0 9px',
+              borderRadius: 6,
+              background: '#2a2a2d',
+              border: '1px solid #36363a',
+            }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <circle cx="11" cy="11" r="7" />
+                <line x1="20" y1="20" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search navigation"
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  border: 'none',
+                  outline: 'none',
+                  background: 'transparent',
+                  color: '#ededed',
+                  fontSize: 12.5,
+                }}
+              />
+            </div>
+            <button
+              onClick={onToggleExpand}
+              title="Collapse sidebar"
+              style={{
+                width: 28, height: 28, border: 'none', background: 'transparent',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#c0c0c0', cursor: 'pointer', borderRadius: 4, flexShrink: 0,
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = '#2e2e2e'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              <CollapseIcon />
+            </button>
+          </div>
           <button
             ref={tenantButtonRef}
             onClick={toggleTenantSwitcher}
@@ -194,13 +253,13 @@ export default function TenantSidebar({ expanded, onToggleExpand, onContextChang
             onMouseEnter={e => { if (!tenantSwitcherOpen) e.currentTarget.style.background = '#525252' }}
             onMouseLeave={e => { if (!tenantSwitcherOpen) e.currentTarget.style.background = '#4a4a4a' }}
             style={{
-              flex: 1,
+              width: '100%',
               minWidth: 0,
               height: 28,
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              padding: '0 2px 0 6px',
+              padding: '0 6px',
               border: 'none',
               borderRadius: 6,
               background: tenantSwitcherOpen ? '#585858' : '#4a4a4a',
@@ -220,19 +279,6 @@ export default function TenantSidebar({ expanded, onToggleExpand, onContextChang
             }}>
               {activeTenant?.name ?? 'Select Tenant'}
             </span>
-          </button>
-          <button
-            onClick={onToggleExpand}
-            title="Collapse sidebar"
-            style={{
-              width: 28, height: 28, border: 'none', background: 'transparent',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#c0c0c0', cursor: 'pointer', borderRadius: 4, flexShrink: 0,
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = '#2e2e2e'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-          >
-            <CollapseIcon />
           </button>
         </div>
       ) : (
@@ -261,11 +307,13 @@ export default function TenantSidebar({ expanded, onToggleExpand, onContextChang
 
       {/* ── Nav items ──────────────────────────────────────────────────── */}
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '6px 0' }}>
-        {TENANT_NAV.map(section => {
+        {visibleSections.map(section => {
           const hasChildren   = section.items.length > 0
           const isOpen        = openSections.has(section.id)
-          const isSectionActive = activeItemId === section.id ||
-            (hasChildren && section.items.some(item => item.id === activeItemId))
+          const hasActiveChild = hasChildren && section.items.some(item => item.id === activeItemId)
+          const isSectionActive = activeItemId === section.id
+          const isCollapsedActive = !expanded && (isSectionActive || hasActiveChild)
+          const showItems = expanded && hasChildren && (isFiltering || isOpen)
 
           return (
             <div key={section.id}>
@@ -282,8 +330,10 @@ export default function TenantSidebar({ expanded, onToggleExpand, onContextChang
                   gap: 8,
                   padding: expanded ? '0 10px 0 12px' : '0',
                   border: 'none',
-                  borderLeft: isSectionActive ? '2px solid #378ADD' : '2px solid transparent',
-                  background: isSectionActive ? '#3a3a3a' : hoveredId === section.id ? '#363636' : 'transparent',
+                  borderLeft: expanded
+                    ? (isSectionActive ? '2px solid #378ADD' : '2px solid transparent')
+                    : (isCollapsedActive ? '2px solid #378ADD' : '2px solid transparent'),
+                  background: isCollapsedActive ? '#3a3a3a' : isSectionActive ? '#3a3a3a' : hoveredId === section.id ? '#363636' : 'transparent',
                   cursor: 'pointer',
                   justifyContent: expanded ? 'flex-start' : 'center',
                   transition: 'background 0.1s',
@@ -293,7 +343,7 @@ export default function TenantSidebar({ expanded, onToggleExpand, onContextChang
                 <span style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   width: 20, height: 20, flexShrink: 0,
-                  color: isSectionActive ? '#378ADD' : '#ffffff',
+                  color: '#ffffff',
                 }}>
                   <CategoryIcon iconKey={section.iconKey} />
                 </span>
@@ -303,7 +353,7 @@ export default function TenantSidebar({ expanded, onToggleExpand, onContextChang
                     <span style={{
                       fontSize: 13,
                       color: isSectionActive ? '#ffffff' : '#d0d0d0',
-                      fontWeight: isSectionActive ? 500 : 400,
+                      fontWeight: isSectionActive ? 600 : 400,
                       flex: 1, textAlign: 'left', whiteSpace: 'nowrap',
                       overflow: 'hidden', textOverflow: 'ellipsis',
                     }}>
@@ -324,7 +374,7 @@ export default function TenantSidebar({ expanded, onToggleExpand, onContextChang
                 )}
               </button>
 
-              {expanded && hasChildren && isOpen && section.items.map(item => {
+              {showItems && section.items.map(item => {
                 const isActive = activeItemId === item.id
                 return (
                   <button
@@ -378,6 +428,7 @@ export default function TenantSidebar({ expanded, onToggleExpand, onContextChang
         <NavFlyout
           category={flyout.category}
           anchorTop={flyout.anchorTop}
+          activeItemId={activeItemId}
           onSelectItem={onSelectItem}
           onClose={() => setFlyout(null)}
         />
